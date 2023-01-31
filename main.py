@@ -4,20 +4,23 @@ from datetime import datetime
 # ASSUMPTIONS:
 # 1. Input file always has a header in the first row position.
 # 2. There is no duplicative records in the files.
-# 3. The order of the record details is the same as the sample file.
-# 4. File name is provided in string format.
-# 4. Every record has a patient ID and they are provided in string format.
-# 5. Birthday is always listed in the 4th index position of the file.
-# 6. Lab Name is always listed in the 3rd index postition of the file.
+# 3. File Names and Patient IDs are provided in string format.
+# 4. The first column is always the patient ID.
 
 
-def parse_data(filename: str) -> list[dict[str, list[str]]]:
+def parse_data(
+    patient_filename: str, lab_filename: str
+) -> tuple[list[dict[str, list[str]]], list[dict[str, list[str]]]]:
     """Parse EHR Data."""
-    with open(filename, mode="r", encoding="utf-8-sig") as file:
-        lines_str = file.readlines()[1:]  # skips header
-        lines_lst = [x.strip().split("\t") for x in lines_str]
-        records = [{r[0]: r[1:]} for r in lines_lst]
-        return records
+    with open(patient_filename, mode="r", encoding="utf-8-sig") as file:
+        patient_lines_str = file.readlines()
+        patient_lines_lst = [i.strip().split("\t") for i in patient_lines_str]
+        patient_records = [{r[0]: r[1:]} for r in patient_lines_lst]
+    with open(lab_filename, mode="r", encoding="utf-8-sig") as file:
+        lab_lines_str = file.readlines()
+        lab_lines_lst = [i.strip().split("\t") for i in lab_lines_str]
+        lab_records = [{r[0]: r[1:]} for r in lab_lines_lst]
+        return patient_records, lab_records
 
 
 def date_type_conversion(date_time: str) -> datetime:
@@ -26,32 +29,37 @@ def date_type_conversion(date_time: str) -> datetime:
 
 
 def patient_age(
-    records: list[dict[str, list[str]]], patient_id: str
-) -> int | str:
+    patient_records: list[dict[str, list[str]]], patient_id: str
+) -> int:
     """Calculate Patient Age in Years."""
-    dob_string = [z[patient_id][1] for z in records if patient_id in z][0]
+    date_index = patient_records[0]["PatientID"].index("PatientDateOfBirth")
+    dob_string = [
+        record[patient_id][date_index]
+        for record in patient_records
+        if patient_id in record
+    ][0]
     dob_int = date_type_conversion(dob_string)
     today = datetime.now()
     age = today.year - dob_int.year
     return int(age)
 
 
-def search(
-    records: list[dict[str, list[str]]], patient_id: str, test_name: str
+def search_test_results(
+    lab_records: list[dict[str, list[str]]], patient_id: str, test_name: str
 ) -> list[float]:
     """Search Test Results by Patient ID."""
+    lab_record_header = lab_records[0]["PatientID"]
+    lab_name_index = lab_record_header.index("LabName")
+    lab_value_index = lab_record_header.index("LabValue")
     return [
-        float(i)
-        for i in [
-            j[patient_id][2]
-            for j in records
-            if (patient_id in j and j[patient_id][1] == test_name)
-        ]
+        float(i[patient_id][lab_value_index])
+        for i in lab_records
+        if (patient_id in i and i[patient_id][lab_name_index] == test_name)
     ]
 
 
 def patient_is_sick(
-    records: list[dict[str, list[str]]],
+    lab_records: list[dict[str, list[str]]],
     patient_id: str,
     lab_name: str,
     operator: str,
@@ -59,10 +67,10 @@ def patient_is_sick(
 ) -> bool:
     """Check if a patient was once sick."""
     if operator == ">":
-        if max(search(records, patient_id, lab_name)) > value:
+        if max(search_test_results(lab_records, patient_id, lab_name)) > value:
             return True
     elif operator == "<":
-        if min(search(records, patient_id, lab_name)) < value:
+        if min(search_test_results(lab_records, patient_id, lab_name)) < value:
             return True
     else:
         return False
@@ -70,11 +78,12 @@ def patient_is_sick(
 
 
 if __name__ == "__main__":
-    patient_records = parse_data("PatientCorePopulatedTable.txt")
-    lab_records = parse_data("LabsCorePopulatedTable.txt")
+    records = parse_data(
+        "PatientCorePopulatedTable.txt", "LabsCorePopulatedTable.txt"
+    )
     print(
         patient_is_sick(
-            lab_records,
+            records[1],
             "1A8791E3-A61C-455A-8DEE-763EB90C9B2C",
             "URINALYSIS: RED BLOOD CELLS",
             ">",
