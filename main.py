@@ -14,13 +14,13 @@ def parse_data(
     """Parse EHR Data."""
     with open(patient_filename, mode="r", encoding="utf-8-sig") as file:
         patient_lines_str = file.readlines()
-        patient_lines_lst = [i.strip().split("\t") for i in patient_lines_str]
-        patient_records = [{r[0]: r[1:]} for r in patient_lines_lst]
+    patient_lines_lst = [i.strip().split("\t") for i in patient_lines_str]
+    patient_records = [{r[0]: r[1:]} for r in patient_lines_lst]
     with open(lab_filename, mode="r", encoding="utf-8-sig") as file:
         lab_lines_str = file.readlines()
-        lab_lines_lst = [i.strip().split("\t") for i in lab_lines_str]
-        lab_records = [{r[0]: r[1:]} for r in lab_lines_lst]
-        return patient_records, lab_records
+    lab_lines_lst = [i.strip().split("\t") for i in lab_lines_str]
+    lab_records = [{r[0]: r[1:]} for r in lab_lines_lst]
+    return patient_records, lab_records
 
 
 def date_type_conversion(date_time: str) -> datetime:
@@ -33,11 +33,11 @@ def patient_age(
 ) -> int:
     """Calculate Patient Age in Years."""
     date_index = patient_records[0]["PatientID"].index("PatientDateOfBirth")
-    dob_string = [
+    dob_string = next(
         record[patient_id][date_index]
         for record in patient_records
         if patient_id in record
-    ][0]
+    )
     dob_int = date_type_conversion(dob_string)
     today = datetime.now()
     age = today.year - dob_int.year
