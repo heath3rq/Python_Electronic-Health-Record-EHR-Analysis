@@ -1,3 +1,6 @@
 .DS_Store
 __pycache__
 venv/
+PatientCorePopulatedTable.txt
+LabCorePopulatedTable.txt
+main.ipynb
