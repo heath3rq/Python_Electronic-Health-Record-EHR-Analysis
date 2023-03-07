@@ -36,35 +36,35 @@ def parse_data(
     patient_lines_lst = [
         i.strip().split("\t") for i in patient_lines_str  # O(N*CP)
     ]
-    patient_records = {}  # O(1)
+    patient_records_dict = {}  # O(1)
     patient_header = patient_lines_lst[0]
     for record in patient_lines_lst[1:]:  # O(N)
-        patient_records[record[0]] = {
+        patient_records_dict[record[0]] = {
             patient_header[record_idx]: record[record_idx]
             for record_idx in range(1, len(record))
-        }  # O(1)
+        }  # O(CP)
 
     with open(lab_filename, mode="r", encoding="utf-8-sig") as file:
-        lab_lines_str = file.readlines()  # O(M)
+        lab_lines_str = file.readlines()  # O(M*CL)
     lab_lines_lst = [i.strip().split("\t") for i in lab_lines_str]  # O(M*CL)
-    lab_records: dict[str, list[dict[str, str]]] = {}  # O(1)
+    lab_records_dict: dict[str, list[dict[str, str]]] = {}  # O(1)
     lab_header = lab_lines_lst[0]  # O(1)
     for line in lab_lines_lst[1:]:  # O(M)
         if line[0] in lab_records:  # O(1)
-            lab_records[line[0]].append(
+            lab_records_dict[line[0]].append(
                 {
                     lab_header[lab_indx]: line[lab_indx]
                     for lab_indx in range(1, len(line))
                 }
             )  # O(CL)
         else:
-            lab_records[line[0]] = [
+            lab_records_dict[line[0]] = [
                 {
                     lab_header[lab_indx]: line[lab_indx]
                     for lab_indx in range(1, len(line))
                 }
             ]  # O(CL)
-    return patient_records, lab_records  # O(1)
+    return patient_records_dict, lab_records_dict  # O(1)
 
 
 def date_type_conversion(date_time: str) -> datetime:
@@ -96,46 +96,6 @@ def patient_age(
     today = datetime.now()  # O(1)
     age = today.year - dob_int.year  # O(1)
     return int(age)  # O(1)
-
-
-def patient_age_at_first_admission(
-    lab_records: dict[str, list[dict[str, str]]],
-    patient_records: dict[str, dict[str, str]],
-    patient_id: str,
-) -> int:
-    """Compute age of a given patient when their earliest lab was recorded.
-
-    Checking if patient id is in either patient records or lab records takes
-    constant time. Accessing patient lab files using patient id takes constant
-    time. Initializing an empty list take O(1). For each patient, looping
-    through their lab files on average takes O(M/N) time. Find the earliest
-    date from a list with the same length as the number of labs for a given
-    patient is O(M/N) time. The rest of the operations takes constant time.
-    Our big-O notation is therefore O(M/N) time.
-
-    """
-    if patient_id not in patient_records:  # O(1)
-        raise ValueError(
-            f"Patient ID: {patient_id} not found in patient data."
-        )  # O(1)
-    if patient_id not in lab_records:
-        raise ValueError(
-            f"Patient ID: {patient_id} not found in lab data."
-        )  # O(1)
-    patient_labs = lab_records[patient_id]  # O(1)
-    lab_dates = []  # O(1)
-    for record in patient_labs:  # O(M/N)
-        lab_dates.append(date_type_conversion(record["LabDateTime"]))  # O(1)
-    earliest_admission_date = min(
-        lab_dates
-    )  # O(M/N) because the length of the lab dates is the same
-    #    as the number of labs a patient has
-    dob_string = patient_records[patient_id]["PatientDateOfBirth"]  # O(1)
-    dob_int = date_type_conversion(dob_string)  # O(1)
-    age_at_first_admission = (
-        earliest_admission_date.year - dob_int.year
-    )  # O(1)
-    return age_at_first_admission  # O(1)
 
 
 def search_test_results(
@@ -203,21 +163,16 @@ def patient_is_sick(
 
 
 if __name__ == "__main__":
-    records = parse_data(
+    patient_records, lab_records = parse_data(
         "PatientCorePopulatedTable.txt", "LabsCorePopulatedTable.txt"
     )
-    print(patient_age(records[0], "1A8791E3-A61C-455A-8DEE-763EB90C9B2C"))
+    print(patient_age(patient_records, "1A8791E3-A61C-455A-8DEE-763EB90C9B2C"))
     print(
         patient_is_sick(
-            records[1],
+            lab_records,
             "1A8791E3-A61C-455A-8DEE-763EB90C9B2C",
-            "URINALYSIS: RED BLOOD CELLSa",
+            "URINALYSIS: RED BLOOD CELLS",
             "<",
             1.5,
-        )
-    )
-    print(
-        patient_age_at_first_admission(
-            records[1], records[0], "FB2ABB23-C9D0-4D09-8464-49BF0B982F0F"
         )
     )
