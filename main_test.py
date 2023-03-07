@@ -1,6 +1,5 @@
 """A module that tests EHR data."""
 import pytest
-from datetime import datetime
 from main import (
     parse_data,
     patient_age,
