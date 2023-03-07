@@ -76,7 +76,7 @@ def date_type_conversion(date_time: str) -> datetime:
 
 
 def patient_age(
-    patient_records: dict[str, dict[str, str]], patient_id: str
+    patient_records_dict: dict[str, dict[str, str]], patient_id: str
 ) -> int:
     """Calculate Patient Age in Years.
 
@@ -87,11 +87,11 @@ def patient_age(
     complexity. Our big-O notation is therefore constant time.
 
     """
-    if patient_id not in patient_records:  # O(1)
+    if patient_id not in patient_records_dict:  # O(1)
         raise ValueError(
             f"Patient ID: {patient_id} not found in patient data."
         )  # O(1)
-    dob_string = patient_records[patient_id]["PatientDateOfBirth"]  # O(1)
+    dob_string = patient_records_dict[patient_id]["PatientDateOfBirth"]  # O(1)
     dob_int = date_type_conversion(dob_string)  # O(1)
     today = datetime.now()  # O(1)
     age = today.year - dob_int.year  # O(1)
@@ -99,7 +99,7 @@ def patient_age(
 
 
 def search_test_results(
-    lab_records: dict[str, list[dict[str, str]]],
+    lab_records_dict: dict[str, list[dict[str, str]]],
     patient_id: str,
     test_name: str,
 ) -> list[float]:
@@ -115,7 +115,7 @@ def search_test_results(
     dropping the constant factors.
     """
     patient_lab_results = []  # O(1)
-    patient_labs = lab_records[patient_id]  # O(1)
+    patient_labs = lab_records_dict[patient_id]  # O(1)
     for record in patient_labs:  # O(M/N)
         if record["LabName"] == test_name:  # O(1)
             patient_lab_results.append(float(record["LabValue"]))  # O(1)
@@ -128,7 +128,7 @@ def search_test_results(
 
 
 def patient_is_sick(
-    lab_records: dict[str, list[dict[str, str]]],
+    lab_records_dict: dict[str, list[dict[str, str]]],
     patient_id: str,
     lab_name: str,
     operator: str,
@@ -151,11 +151,13 @@ def patient_is_sick(
         )  # O(1)
 
     if operator == ">" and (
-        max(search_test_results(lab_records, patient_id, lab_name)) > value
+        max(search_test_results(lab_records_dict, patient_id, lab_name))
+        > value
     ):  # O(M/N)
         return True  # O(1)
     elif operator == "<" and (
-        max(search_test_results(lab_records, patient_id, lab_name)) < value
+        max(search_test_results(lab_records_dict, patient_id, lab_name))
+        < value
     ):  # O(M/N)
         return True  # O(1)
     else:  # O(1)
