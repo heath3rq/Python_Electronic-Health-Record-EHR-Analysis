@@ -78,6 +78,8 @@ def test_parse_data() -> tuple[
     # If I don't have a return statement here, mypy is upset. If I do, pytest
     # gives me a warning. What would you recommend here?
 
+    return patient_records, lab_records
+
 
 def test_patient_age() -> int:
     """Test patient age function."""
@@ -86,6 +88,7 @@ def test_patient_age() -> int:
         patient_records, "FB2ABB23-C9D0-4D09-8464-49BF0B982F0F"
     )
     assert patient_age_ == 76, "Error calculating patient age."
+    return patient_age_
 
 
 def test_patient_is_sick() -> bool:
@@ -98,6 +101,7 @@ def test_patient_is_sick() -> bool:
         1.5,
     )
     assert sick is False, "Error in patient_is_sick method."
+    return sick
 
 
 # Tests for when incorrect input were given
