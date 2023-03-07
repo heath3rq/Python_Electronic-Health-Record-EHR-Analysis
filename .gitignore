@@ -2,5 +2,5 @@
 __pycache__
 venv/
 PatientCorePopulatedTable.txt
-LabCorePopulatedTable.txt
+LabsCorePopulatedTable.txt
 main.ipynb
