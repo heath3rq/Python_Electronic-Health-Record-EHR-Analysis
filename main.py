@@ -50,7 +50,7 @@ def parse_data(
     lab_records_dict: dict[str, list[dict[str, str]]] = {}  # O(1)
     lab_header = lab_lines_lst[0]  # O(1)
     for line in lab_lines_lst[1:]:  # O(M)
-        if line[0] in lab_records:  # O(1)
+        if line[0] in lab_records_dict:  # O(1)
             lab_records_dict[line[0]].append(
                 {
                     lab_header[lab_indx]: line[lab_indx]
