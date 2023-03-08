@@ -104,6 +104,10 @@ def test_patient_age() -> None:
         patient_records, "FB2ABB23-C9D0-4D09-8464-49BF0B982F0F"
     )
     assert patient_age_ == 76, "Error calculating patient age."
+    with pytest.raises(ValueError):
+        patient_age(
+            patient_records_dict, "FB2ABB23-C9D0-4D09-8464-49BF0B982F0FBB"
+        )
 
 
 def test_patient_is_sick() -> None:
@@ -116,34 +120,6 @@ def test_patient_is_sick() -> None:
         1.5,
     )
     assert sick is False, "Error in patient_is_sick method."
-
-
-def test_wrong_patient_id_pis() -> None:
-    """Test patient_is_sick function when incorrect patient ID is given."""
-    with pytest.raises(ValueError):
-        patient_is_sick(
-            lab_records_dict,
-            "1A8791E3-A61C-455A-8DEE-763EB90C9B2CA",
-            "URINALYSIS: RED BLOOD CELLS",
-            "<",
-            1.5,
-        )
-
-
-def test_wrong_operator_pis() -> None:
-    """Test patient_is_sick function when incorrect operator is given."""
-    with pytest.raises(ValueError):
-        patient_is_sick(
-            lab_records_dict,
-            "1A8791E3-A61C-455A-8DEE-763EB90C9B2C",
-            "URINALYSIS: RED BLOOD CELLS",
-            "=",
-            1.5,
-        )
-
-
-def test_wrong_test_name_pis() -> None:
-    """Test patient_is_sick function when incorrect test name is given."""
     with pytest.raises(ValueError):
         patient_is_sick(
             lab_records_dict,
@@ -152,11 +128,19 @@ def test_wrong_test_name_pis() -> None:
             "<",
             1.5,
         )
-
-
-def test_wrong_patient_id_pa() -> None:
-    """Test patient_age function when incorrect patient ID is given."""
     with pytest.raises(ValueError):
-        patient_age(
-            patient_records_dict, "FB2ABB23-C9D0-4D09-8464-49BF0B982F0FBB"
+        patient_is_sick(
+            lab_records_dict,
+            "1A8791E3-A61C-455A-8DEE-763EB90C9B2CA",
+            "URINALYSIS: RED BLOOD CELLS",
+            "<",
+            1.5,
+        )
+    with pytest.raises(ValueError):
+        patient_is_sick(
+            lab_records_dict,
+            "1A8791E3-A61C-455A-8DEE-763EB90C9B2C",
+            "URINALYSIS: RED BLOOD CELLS",
+            "=",
+            1.5,
         )
