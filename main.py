@@ -145,7 +145,7 @@ def patient_is_sick(
     """
     if operator not in ["<", ">"]:  # O(1)
         raise ValueError("Operator can only be '<' or '>'.")  # O(1)
-    if patient_id not in lab_records:  # O(1)
+    if patient_id not in lab_records_dict:  # O(1)
         raise ValueError(
             f"Patient ID: {patient_id} not found in lab data."
         )  # O(1)
