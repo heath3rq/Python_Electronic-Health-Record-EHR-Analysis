@@ -57,7 +57,7 @@ The `main.py` includes three main functions and two helper functions:
 >> ssearch_test_results(lab_records, "FB2ABB23-C9D0-4D09-8464-49BF0B982F0F", "URINALYSIS: RED BLOOD CELLS")
 [3.1, 0.8, 1.1, 2.7, 0.1, 1.4, 2.7, 1.9, 1.9, 3.3, 2.7, 2.2, 0.9, 0.5, 1.9, 1.9, 2.2, 0.4]
 
->> patient_is_sick(records, "1A8791E3-A61C-455A-8DEE-763EB90C9B2C", "METABOLIC: ALBUMIN", ">", 4.0)
+>> patient_is_sick(lab_records, "1A8791E3-A61C-455A-8DEE-763EB90C9B2C", "METABOLIC: ALBUMIN", ">", 4.0)
 True
 ```
 
