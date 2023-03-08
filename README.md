@@ -3,8 +3,9 @@
 The ehr-utils library provides analytical capabilities for EHR data.
 
 ### Setup Instructions
-* Clone the repo: https://github.com/biostat821-2023/ehr-utils-heath3rq.git
-* Python version: 3.10 and above
+* In your local terminal, clone the repo: 
+```git clone https://github.com/biostat821-2023/ehr-utils-heath3rq.git```
+* Python version: `3.10 and above`
 * Required libraries: `datatime`
 
 
