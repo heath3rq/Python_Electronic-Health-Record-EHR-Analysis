@@ -20,13 +20,13 @@ lab_records_dict = {
 }
 
 patient_records_dict = {
-    "FB2ABB23-C9D0-4D09-8464-49BF0B982F0F": {
+    "1A8791E3-A61C-455A-8DEE-763EB90C9B2C": {
         "PatientGender": "Male",
-        "PatientDateOfBirth": "1947-12-28 02:45:40.547",
-        "PatientRace": "Unknown",
-        "PatientMaritalStatus": "Married",
-        "PatientLanguage": "Icelandic",
-        "PatientPopulationPercentageBelowPoverty": "18.08",
+        "PatientDateOfBirth": "1973-08-16 10:58:34.413",
+        "PatientRace": "Asian",
+        "PatientMaritalStatus": "Single",
+        "PatientLanguage": "English",
+        "PatientPopulationPercentageBelowPoverty": "13.97",
     },
 }
 
@@ -62,25 +62,25 @@ def test_parse_data() -> None:
             "PatientPopulationPercentageBelowPoverty",
         ],
         [
-            "FB2ABB23-C9D0-4D09-8464-49BF0B982F0F",
+            "1A8791E3-A61C-455A-8DEE-763EB90C9B2C",
             "Male",
-            "1947-12-28 02:45:40.547",
-            "Unknown",
-            "Married",
-            "Icelandic",
-            "18.08",
+            "1973-08-16 10:58:34.413",
+            "Asian",
+            "Single",
+            "English",
+            "13.97",
         ],
     ]
     with fake_files(table_lab) as labs, fake_files(table_patient) as patients:
         patient_records, lab_records = parse_data(patients[0], labs[0])
         assert patient_records == {
-            "FB2ABB23-C9D0-4D09-8464-49BF0B982F0F": {
+            "1A8791E3-A61C-455A-8DEE-763EB90C9B2C": {
                 "PatientGender": "Male",
-                "PatientDateOfBirth": "1947-12-28 02:45:40.547",
-                "PatientRace": "Unknown",
-                "PatientMaritalStatus": "Married",
-                "PatientLanguage": "Icelandic",
-                "PatientPopulationPercentageBelowPoverty": "18.08",
+                "PatientDateOfBirth": "1973-08-16 10:58:34.413",
+                "PatientRace": "Asian",
+                "PatientMaritalStatus": "Single",
+                "PatientLanguage": "English",
+                "PatientPopulationPercentageBelowPoverty": "13.97",
             }
         }, "Error parsing patient file."
 
@@ -101,9 +101,9 @@ def test_patient_age() -> None:
     """Test patient age function."""
     patient_records = patient_records_dict
     patient_age_ = patient_age(
-        patient_records, "FB2ABB23-C9D0-4D09-8464-49BF0B982F0F"
+        patient_records, "1A8791E3-A61C-455A-8DEE-763EB90C9B2C"
     )
-    assert patient_age_ == 76, "Error calculating patient age."
+    assert patient_age_ == 50, "Error calculating patient age."
     with pytest.raises(ValueError):
         patient_age(
             patient_records_dict, "FB2ABB23-C9D0-4D09-8464-49BF0B982F0FBB"
