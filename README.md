@@ -3,43 +3,43 @@
 The ehr-utils library provides analytical capabilities for EHR data.
 
 ### Setup Instructions
-    * Clone the repo: https://github.com/biostat821-2023/ehr-utils-heath3rq.git
-    * Python version: 3.10 and above
-    * Required libraries: `datatime`
+* Clone the repo: https://github.com/biostat821-2023/ehr-utils-heath3rq.git
+* Python version: 3.10 and above
+* Required libraries: `datatime`
 
 
 ### Details of Each Function and Expected Input
 The `main.py` includes three main functions and two helper functions:
-    * `parse_data` reads and parses the data files.
-        - Input: 
-            a. A path to a `.txt` file storing patient information where the first column is the patient ID. 
-            b. A path to a `.txt` file storing lab information of patients where the first column is the patient ID. 
-        - Output: a tuple of two dictionaries, one for patient information and the other for lab information of patients. 
+* `parse_data` reads and parses the data files.
+    - Input: 
+        a. A path to a `.txt` file storing patient information where the first column is the patient ID. 
+        b. A path to a `.txt` file storing lab information of patients where the first column is the patient ID. 
+    - Output: a tuple of two dictionaries, one for patient information and the other for lab information of patients. 
 
-    * `date_type_conversion` converts date in string format to datetime format. It is used internally in `patient_age` method.
-        - Input: date of birth in string format
-        - Output: date of birth in date format
+* `date_type_conversion` converts date in string format to datetime format. It is used internally in `patient_age` method.
+    - Input: date of birth in string format
+    - Output: date of birth in date format
 
-    * `patient_age` calculates the age in years of a given patient. 
-        - Input: 
-            a. Patient information stored in dictionary format. This is the first dictionary in the resulting tuple from `parse_date` function. 
-            b. Patient ID in string format
-        - Output: the age of a given patient
+* `patient_age` calculates the age in years of a given patient. 
+    - Input: 
+        a. Patient information stored in dictionary format. This is the first dictionary in the resulting tuple from `parse_date` function. 
+        b. Patient ID in string format
+    - Output: the age of a given patient
 
-    * `search_test_results`: searches test results of a given patient. It is used internally in `patient_is_sick` method.
-        - Input: 
-            a. Lab information of patients stored in dictionary format. This is the second dictionary in the resulting tuple from `parse_date` function. 
-            b. Patient ID in string format
-            c. Lab test name of interest in string format
-        - Output: 
+* `search_test_results`: searches test results of a given patient. It is used internally in `patient_is_sick` method.
+    - Input: 
+        a. Lab information of patients stored in dictionary format. This is the second dictionary in the resulting tuple from `parse_date` function. 
+        b. Patient ID in string format
+        c. Lab test name of interest in string format
+    - Output: 
 
-    * `patient_is_sick`: checks whether a patient has ever had a test with value above (">") or below ("<") the given level
-        - Input: 
-            a. Lab information of patients stored in dictionary format. This is the second dictionary in the resulting tuple from `parse_date` function. 
-            b. Patient ID in string format
-            c. Lab test name of interest in string format
-            d. A number as the decision criteria of test values
-        - Output: `True` or `False` indcating whether a patient has ever been sick
+* `patient_is_sick`: checks whether a patient has ever had a test with value above (">") or below ("<") the given level
+    - Input: 
+        a. Lab information of patients stored in dictionary format. This is the second dictionary in the resulting tuple from `parse_date` function. 
+        b. Patient ID in string format
+        c. Lab test name of interest in string format
+        d. A number as the decision criteria of test values
+    - Output: `True` or `False` indcating whether a patient has ever been sick
 
 
 ### Examples
