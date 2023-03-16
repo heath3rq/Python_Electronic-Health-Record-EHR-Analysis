@@ -5,7 +5,9 @@ from main import (
     parse_data,
     patient_age,
     patient_is_sick,
+    patient_age_at_first_admission,
 )
+
 
 lab_records_dict = {
     "1A8791E3-A61C-455A-8DEE-763EB90C9B2C": [
@@ -107,6 +109,24 @@ def test_patient_age() -> None:
     with pytest.raises(ValueError):
         patient_age(
             patient_records_dict, "FB2ABB23-C9D0-4D09-8464-49BF0B982F0FBB"
+        )
+
+
+def test_patient_age_at_first_admission() -> None:
+    """Test patient age at first admission function"""
+    age_at_admin = patient_age_at_first_admission(
+        patient_records_dict,
+        lab_records_dict,
+        "1A8791E3-A61C-455A-8DEE-763EB90C9B2C",
+    )
+    assert (
+        age_at_admin == 19
+    ), "Error in patient_age_at_first_admission function"
+    with pytest.raises(ValueError):
+        patient_age_at_first_admission(
+            patient_records_dict,
+            lab_records_dict,
+            "1A8791E3-A61C-455A-8DEE-763EB90C9B2C123",
         )
 
 
