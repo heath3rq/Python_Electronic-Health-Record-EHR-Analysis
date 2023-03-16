@@ -42,6 +42,8 @@ The `main.py` includes three main functions and two helper functions:
         d. A number as the decision criteria of test values
     - Output: `True` or `False` indcating whether a patient has ever been sick
 
+* `patient_age_at_first_admission`: computes the age of a given patient when their earliest lab was recorded. 
+
 
 ### Examples
 ```python
@@ -59,6 +61,9 @@ The `main.py` includes three main functions and two helper functions:
 
 >> patient_is_sick(lab_records, "1A8791E3-A61C-455A-8DEE-763EB90C9B2C", "METABOLIC: ALBUMIN", ">", 4.0)
 True
+
+>>> patient_age_at_first_admission(lab_records, patient_records, "FB2ABB23-C9D0-4D09-8464-49BF0B982F0F")
+19
 ```
 
 ### Test Instruction

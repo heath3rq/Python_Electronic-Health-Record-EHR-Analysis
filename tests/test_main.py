@@ -5,7 +5,9 @@ from main import (
     parse_data,
     patient_age,
     patient_is_sick,
+    patient_age_at_first_admission,
 )
+
 
 lab_records_dict = {
     "1A8791E3-A61C-455A-8DEE-763EB90C9B2C": [
@@ -16,7 +18,16 @@ lab_records_dict = {
             "LabUnits": "rbc/hpf",
             "LabDateTime": "1992-07-01 01:36:17.910",
         },
-    ]
+    ],
+    "1A8791E3-A61C-455A-8DEE-763EB90C9B2F": [
+        {
+            "AdmissionID": "1",
+            "LabName": "URINALYSIS: RED BLOOD CELLS",
+            "LabValue": "6.8",
+            "LabUnits": "rbc/hpf",
+            "LabDateTime": "1990-08-01 01:34:17.910",
+        },
+    ],
 }
 
 patient_records_dict = {
@@ -27,6 +38,14 @@ patient_records_dict = {
         "PatientMaritalStatus": "Single",
         "PatientLanguage": "English",
         "PatientPopulationPercentageBelowPoverty": "13.97",
+    },
+    "1A8791E3-A61C-455A-8DEE-763EB90C9B2O": {
+        "PatientGender": "Male",
+        "PatientDateOfBirth": "1970-07-20 11:08:25.413",
+        "PatientRace": "White",
+        "PatientMaritalStatus": "Divorced",
+        "PatientLanguage": "American",
+        "PatientPopulationPercentageBelowPoverty": "10.23",
     },
 }
 
@@ -107,6 +126,30 @@ def test_patient_age() -> None:
     with pytest.raises(ValueError):
         patient_age(
             patient_records_dict, "FB2ABB23-C9D0-4D09-8464-49BF0B982F0FBB"
+        )
+
+
+def test_patient_age_at_first_admission() -> None:
+    """Test patient age at first admission function"""
+    age_at_admin = patient_age_at_first_admission(
+        patient_records_dict,
+        lab_records_dict,
+        "1A8791E3-A61C-455A-8DEE-763EB90C9B2C",
+    )
+    assert (
+        age_at_admin == 19
+    ), "Error in patient_age_at_first_admission function"
+    with pytest.raises(ValueError):
+        patient_age_at_first_admission(
+            patient_records_dict,
+            lab_records_dict,
+            "1A8791E3-A61C-455A-8DEE-763EB90C9B2C123",
+        )
+    with pytest.raises(ValueError):
+        patient_age_at_first_admission(
+            patient_records_dict,
+            lab_records_dict,
+            "1A8791E3-A61C-455A-8DEE-763EB90C9B2O",
         )
 
 
