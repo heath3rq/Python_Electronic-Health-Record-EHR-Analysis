@@ -9,7 +9,7 @@ The ehr-utils library provides analytical capabilities for EHR data.
 * Required libraries: `datatime`, `dataclasses`, `pytest`
 
 
-### Details of Each Function and Expected Input
+### Details of Each Function/Class
 The `main.py` includes two custom classes and three functions:
 
 * Class `Lab` storing lab information of a patient as instance attributes
@@ -18,26 +18,26 @@ The `main.py` includes two custom classes and three functions:
     - `age`: returns the age in years of a given patient.
     - `age_at_first_admission` returns the age of a given patient when their earliest lab was recorded. 
     - `patient_is_sick`: checks whether a patient has ever had a test with value above (">") or below ("<") the given level
-        -  Input: 
-            a. Patient ID in string format
-            b. Lab test name of interest in string format
-            c. A number as the decision criteria of test values
+        -  Input:  
+            (a) Patient ID in string format
+            (b) Lab test name of interest in string format
+            (c) A number as the decision criteria of test values
         - Output: `True` or `False` indcating whether a patient has ever been sick
 
 * `parse_data` reads and parses the data files.
     - Input: 
-        a. A path to a `.txt` file storing patient information where the first column is the patient ID. 
-        b. A path to a `.txt` file storing lab information of patients where the first column is the patient ID. 
+        (a) A path to a `.txt` file storing patient information where the first column is the patient ID. 
+        (b) A path to a `.txt` file storing lab information of patients where the first column is the patient ID. 
     - Output: a dictionary with Patient IDs as keys and the `Patient` class as values
 
 * `date_type_conversion` converts date in string format to datetime format. It is used internally in `patient_age` method.
     - Input: date of birth in string format
     - Output: date of birth in date format
 
-* `search_test_results`: searches test results of a given patient. It is used internally in `patient_is_sick` method.
+* `search_test_results` searches test results of a given patient. It is used internally in `patient_is_sick` method.
     - Input: 
-        a. Lab information of patients stored in the `Lab` class, child of the `Patient` class
-        b. Lab test name of interest in string format
+        (a) Lab information of patients stored in the `Lab` class, child of the `Patient` class
+        (b) Lab test name of interest in string format
     - Output: A list of all lab results of a given patient 
 
 
