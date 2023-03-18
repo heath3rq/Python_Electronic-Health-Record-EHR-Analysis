@@ -1,5 +1,6 @@
 """A module that analyzes EHR data."""
 from datetime import datetime
+from dataclasses import dataclass
 
 # COMPUTATIONAL COMPLEXITY DEFINITION
 # N is the number of patients
@@ -13,46 +14,28 @@ from datetime import datetime
 # 3. File Names and Patient IDs are provided in string format.
 
 
+@dataclass
 class Lab:
     """A Class for Lab Information."""
 
-    def __init__(
-        self,
-        patient_id: str,
-        lab_name: str,
-        lab_value: str,
-        lab_date: str
-        #  lab_units: str,
-    ) -> None:
-        """Initialize Lab Class."""
-        self.patient_id = patient_id
-        self.lab_name = lab_name
-        self.lab_value = lab_value
-        self.lab_date = lab_date
-        # self.lab_units = lab_units
+    patient_id: str
+    lab_name: str
+    lab_value: str
+    lab_date: str
+    #  lab_units: str
 
 
+@dataclass
 class Patient:
     """A Class for Patient Information."""
 
-    def __init__(
-        self,
-        patient_id: str,
-        dob: str,
-        labs: list[Lab],
-        # gender: str,
-        # race: str,
-        # marital_status: str,
-        # language: str,
-    ) -> None:
-        """Initialize Patient Class."""
-        self.patient_id = patient_id
-        self.dob = dob
-        self.labs = labs
-        # self.gender = gender
-        # self.race = race
-        # self.marital_status = marital_status
-        # self.language = language
+    patient_id: str
+    dob: str
+    labs: list[Lab]
+    # gender: str
+    # race: str
+    # marital_status: str
+    # language: str
 
     @property
     def age(self) -> int:
