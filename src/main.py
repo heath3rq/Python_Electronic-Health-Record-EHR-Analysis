@@ -1,9 +1,8 @@
+# PHASE 6 2ND VERSION
 """A module that analyzes EHR data."""
 from datetime import datetime
 import os
 import sqlite3
-
-# from dataclasses import dataclass
 
 # COMPUTATIONAL COMPLEXITY DEFINITION
 # N is the number of patients
@@ -25,26 +24,18 @@ class Lab:
         self,
         database_name: str,
         patient_id: str,
-        #  lab_name: str,
-        #  lab_value: str,
-        #  lab_date: str,
-        #  lab_units: str,
     ) -> None:
         """Initialize Lab Class."""
         connection = sqlite3.connect(database_name)
         with connection as cursor:
-            self.lab_name = cursor.execute(
-                "SELECT lab_name FROM labs WHERE patient_id = ?", (patient_id,)
-            ).fetchall()
-            self.lab_value = cursor.execute(
-                "SELECT lab_value FROM labs WHERE patient_id = ?",
+            data = cursor.execute(
+                "SELECT lab_name, lab_value, lab_date "
+                "FROM labs WHERE patient_id = ?",
                 (patient_id,),
             ).fetchall()
-            self.lab_date = cursor.execute(
-                "SELECT lab_date FROM labs WHERE patient_id = ?", (patient_id,)
-            ).fetchall()
-            # self.lab_units = cursor.execute("SELECT lab_units FROM labs "
-            # "WHERE patient_id = ?", (patient_id,)).fetchall()
+            self.lab_name = list(zip(*data))[0]
+            self.lab_value = list(zip(*data))[1]
+            self.lab_date = list(zip(*data))[2]
 
 
 class Patient:
@@ -54,12 +45,6 @@ class Patient:
         self,
         patient_id: str,
         database_name: str,
-        # dob: str,
-        # labs: list[Lab],
-        # gender: str,
-        # race: str,
-        # marital_status: str,
-        # language: str,
     ) -> None:
         """Initialize Patient Class."""
         self.patient_id = patient_id
@@ -94,10 +79,9 @@ class Patient:
         Our big-O notation is therefore O(M/N) time.
 
         """
-        # patient_labs = self.lab # O(1)
         lab_dates = []  # O(1)
         for record in self.labs.lab_date:  # O(M/N)
-            lab_dates.append(date_type_conversion(record[0]))  # O(1)
+            lab_dates.append(date_type_conversion(record))  # O(1)
         earliest_admission_date = min(
             lab_dates
         )  # O(M/N) because the length of the lab dates is the same
@@ -126,10 +110,11 @@ class Patient:
         if operator not in ["<", ">"]:  # O(1)
             raise ValueError("Operator can only be '<' or '>'.")  # O(1)
 
-        lab_values = []
-        for _idx, _lab_name in enumerate(self.labs.lab_name):
-            if _lab_name[0] == lab_name:
-                lab_values.append(float(self.labs.lab_value[_idx][0]))
+        lab_values = [
+            float(value[0])
+            for key, value in zip(self.labs.lab_name, self.labs.lab_value)
+            if key == lab_name
+        ]
 
         if not lab_values:
             raise ValueError(
@@ -212,17 +197,16 @@ def parse_data(
             line.strip().split("\t") for line in patient_lines_str
         ]  # O(N*CP)
 
-        for lab_line in lab_lines_lst[1:]:  # O(M*CL)
-            cursor.execute(
-                "INSERT INTO labs(patient_id, admission_id, lab_name, "
-                "lab_value, lab_unit, lab_date) VALUES (?,?,?,?,?,?)",
-                lab_line,
-            )
+        cursor.executemany(
+            "INSERT INTO labs(patient_id, admission_id, lab_name, "
+            "lab_value, lab_unit, lab_date) VALUES (?,?,?,?,?,?)",
+            lab_lines_lst[1:],
+        )
 
-        for patient_line in patient_lines_lst[1:]:  # O(N*CP)
-            cursor.execute(
-                "INSERT INTO patients VALUES (?,?,?,?,?,?,?)", patient_line
-            )
+        cursor.executemany(
+            "INSERT INTO patients VALUES (?,?,?,?,?,?,?)",
+            patient_lines_lst[1:],
+        )
 
 
 def date_type_conversion(date_time: str) -> datetime:
