@@ -5,3 +5,4 @@ PatientCorePopulatedTable.txt
 LabsCorePopulatedTable.txt
 test_report.txt
 .coverage
+SampleDB.db

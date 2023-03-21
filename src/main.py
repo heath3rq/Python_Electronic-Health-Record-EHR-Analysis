@@ -1,6 +1,9 @@
 """A module that analyzes EHR data."""
 from datetime import datetime
-from dataclasses import dataclass
+import os
+import sqlite3
+
+# from dataclasses import dataclass
 
 # COMPUTATIONAL COMPLEXITY DEFINITION
 # N is the number of patients
@@ -11,31 +14,103 @@ from dataclasses import dataclass
 # ASSUMPTIONS:
 # 1. Input file always has a header in the first row position.
 # 2. There is no duplicative records in the files.
-# 3. File Names and Patient IDs are provided in string format.
+# 3. File Names, database name and Patient IDs are provided in string format.
+# 4. File must contain columns in the same order as the sample input files
 
 
-@dataclass
 class Lab:
     """A Class for Lab Information."""
 
-    patient_id: str
-    lab_name: str
-    lab_value: str
-    lab_date: str
-    #  lab_units: str
+    def __init__(
+        self,
+        database_name: str,
+        patient_id: str,
+        #  lab_name: str,
+        #  lab_value: str,
+        #  lab_date: str,
+        #  lab_units: str,
+    ) -> None:
+        """Initialize Lab Class."""
+        connection = sqlite3.connect(database_name)
+        with connection as cursor:
+            self.lab_name = cursor.execute(
+                "SELECT lab_name FROM labs WHERE patient_id = ?", (patient_id,)
+            ).fetchall()
+            self.lab_value = cursor.execute(
+                "SELECT lab_value FROM labs WHERE patient_id = ?",
+                (patient_id,),
+            ).fetchall()
+            self.lab_date = cursor.execute(
+                "SELECT lab_date FROM labs WHERE patient_id = ?", (patient_id,)
+            ).fetchall()
+            # self.lab_units = cursor.execute("SELECT lab_units FROM labs "
+            # "WHERE patient_id = ?", (patient_id,)).fetchall()
 
 
-@dataclass
+# @dataclass
+# class Lab:
+#     """A Class for Lab Information."""
+
+#     patient_id: str
+#     database_name: str
+#     #  lab_units: str
+#     connection = sqlite3.connect(database_name)
+#     with connection as cursor:
+#         lab_name = cursor.execute(
+#             "SELECT lab_name FROM labs WHERE patient_id = ?", (patient_id,)
+#         ).fetchall()
+#         lab_value = cursor.execute(
+#             "SELECT lab_value FROM labs WHERE patient_id = ?", (patient_id,)
+#         ).fetchall()
+#         lab_date = cursor.execute(
+#             "SELECT lab_date FROM labs WHERE patient_id = ?", (patient_id,)
+#         ).fetchall()
+#         lab_units = cursor.execute(
+#             "SELECT lab_units FROM labs WHERE patient_id = ?", (patient_id,)
+#             ).fetchall()
+
+# @dataclass
+# class Patient:
+#     """A Class for Patient Information."""
+#     patient_id: str
+#     database_name: str
+#     # dob: str,
+#     # labs: list[Lab],
+#     # gender: str,
+#     # race: str,
+#     # marital_status: str,
+#     # language: str,
+#     patient_id = patient_id
+#     connection = sqlite3.connect(database_name)
+#     with connection as cursor:
+#         dob = cursor.execute("SELECT date_of_birth FROM patients "
+#               "WHERE id = ?", (patient_id,)).fetchall()[0][0]
+#         labs = Lab(patient_id, database_name)
+
+
 class Patient:
     """A Class for Patient Information."""
 
-    patient_id: str
-    dob: str
-    labs: list[Lab]
-    # gender: str
-    # race: str
-    # marital_status: str
-    # language: str
+    def __init__(
+        self,
+        patient_id: str,
+        database_name: str,
+        # dob: str,
+        # labs: list[Lab],
+        # gender: str,
+        # race: str,
+        # marital_status: str,
+        # language: str,
+    ) -> None:
+        """Initialize Patient Class."""
+        self.patient_id = patient_id
+        connection = sqlite3.connect(database_name)
+        with connection as cursor:
+            self.dob = cursor.execute(
+                "SELECT date_of_birth FROM patients WHERE id = ?",
+                (self.patient_id,),
+            ).fetchall()[0][0]
+            self.labs = Lab(database_name, self.patient_id)
 
     @property
     def age(self) -> int:
@@ -60,10 +135,10 @@ class Patient:
         Our big-O notation is therefore O(M/N) time.
 
         """
-        patient_labs = self.labs  # O(1)
+        # patient_labs = self.lab # O(1)
         lab_dates = []  # O(1)
-        for record in patient_labs:  # O(M/N)
-            lab_dates.append(date_type_conversion(record.lab_date))  # O(1)
+        for record in self.labs.lab_date:  # O(M/N)
+            lab_dates.append(date_type_conversion(record[0]))  # O(1)
         earliest_admission_date = min(
             lab_dates
         )  # O(M/N) because the length of the lab dates is the same
@@ -91,20 +166,35 @@ class Patient:
         """
         if operator not in ["<", ">"]:  # O(1)
             raise ValueError("Operator can only be '<' or '>'.")  # O(1)
+        # if lab_name not in
+
+        lab_values = []
+        # print(lab_values)
+        for _idx, _lab_name in enumerate(self.labs.lab_name):
+            if _lab_name[0] == lab_name:
+                lab_values.append(float(self.labs.lab_value[_idx][0]))
+
+        if not lab_values:
+            raise ValueError(
+                f"""The patient has never done the test \
+[{lab_name}]."""
+            )  # O(1)
 
         if operator == ">" and (
-            max(search_test_results(self.labs, lab_name)) > decision_threshold
+            max(lab_values) > decision_threshold
         ):  # O(M/N)
             return True  # O(1)
         elif operator == "<" and (
-            min(search_test_results(self.labs, lab_name)) < decision_threshold
+            min(lab_values) < decision_threshold
         ):  # O(M/N)
             return True  # O(1)
         else:  # O(1)
             return False  # O(1)
 
 
-def parse_data(patient_filename: str, lab_filename: str) -> dict[str, Patient]:
+def parse_data(
+    patient_filename: str, lab_filename: str, database_name: str
+) -> None:
     """Parse EHR Data.
 
     Opening the file takes constant time, but reading lines takes O(N*CP) or
@@ -117,55 +207,65 @@ def parse_data(patient_filename: str, lab_filename: str) -> dict[str, Patient]:
     O(CL*M+CP*N) after dropping the constant factors.
 
     """
-    lab_lines_str = open(
-        lab_filename, mode="r", encoding="utf-8-sig"
-    ).readlines()  # O(M*CL)
-    patient_lines_str = open(
-        patient_filename, mode="r", encoding="utf-8-sig"
-    ).readlines()  # O(N*CP)
+    if os.path.exists(database_name):
+        os.remove(database_name)
+    if not os.path.exists(patient_filename):
+        raise FileNotFoundError("Patient file not found")
+    if not os.path.exists(lab_filename):
+        raise FileNotFoundError("Lab file not found")
 
-    lab_lines_lst = [
-        line.strip().split("\t") for line in lab_lines_str
-    ]  # O(M*CL)
-    patient_lines_lst = [
-        line.strip().split("\t") for line in patient_lines_str
-    ]  # O(N*CP)
-
-    patient_records_dict = {}  # O(1)
-    lab_records_dict: dict[str, list[Lab]] = {}  # O(1)
-
-    lab_header = lab_lines_lst[0]  # O(1)
-    lab_patient_id_idx = lab_header.index("PatientID")
-    patient_header = patient_lines_lst[0]
-    patient_id_idx = patient_header.index("PatientID")
-
-    for lab_line in lab_lines_lst[1:]:  # O(M*CL)
-        lab_obj = Lab(
-            patient_id=lab_line[lab_patient_id_idx],  # O(CL)
-            lab_name=lab_line[lab_header.index("LabName")],  # O(CL)
-            lab_value=lab_line[lab_header.index("LabValue")],  # O(CL)
-            lab_date=lab_line[lab_header.index("LabDateTime")],  # O(CL)
-            #   lab_units=lab_line[lab_header.index("LabUnits")], # O(CL)
+    connection = sqlite3.connect(database_name)
+    with connection as cursor:
+        cursor.execute("DROP TABLE IF EXISTS patients")
+        cursor.execute("DROP TABLE IF EXISTS labs")
+        cursor.execute(
+            """CREATE TABLE IF NOT EXISTS patients(
+                id VARCHAR PRIMARY KEY,
+                gender VARCHAR,
+                date_of_birth VARCHAR,
+                race VARCHAR,
+                marital_status VARCHAR,
+                language VARCHAR,
+                population_percentage_below_povert VARCHAR
+                )"""
         )
-        if lab_line[lab_patient_id_idx] in lab_records_dict:  # O(1)
-            lab_records_dict[lab_line[lab_patient_id_idx]].append(
-                lab_obj
-            )  # O(1)
-        else:  # O(1)
-            lab_records_dict[lab_line[lab_patient_id_idx]] = [lab_obj]  # O(1)
-
-    for patient_line in patient_lines_lst[1:]:  # O(N*CP)
-        patient_obj = Patient(
-            patient_id=patient_line[patient_id_idx],  # O(CP)
-            dob=patient_line[
-                patient_header.index("PatientDateOfBirth")
-            ],  # O(CP)
-            labs=lab_records_dict[patient_line[patient_id_idx]],  # O(CP)
+        cursor.execute(
+            """CREATE TABLE IF NOT EXISTS labs(
+                lab_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                patient_id VARCHAR,
+                admission_id VARCHAR,
+                lab_name VARCHAR,
+                lab_value VARCHAR,
+                lab_unit VARCHAR,
+                lab_date VARCHAR
+                )"""
         )
-        patient_records_dict[
-            patient_line[patient_id_idx]
-        ] = patient_obj  # O(1)
-    return patient_records_dict  # O(1)
+
+        lab_lines_str = open(
+            lab_filename, mode="r", encoding="utf-8-sig"
+        ).readlines()  # O(M*CL)
+        patient_lines_str = open(
+            patient_filename, mode="r", encoding="utf-8-sig"
+        ).readlines()  # O(N*CP)
+
+        lab_lines_lst = [
+            line.strip().split("\t") for line in lab_lines_str
+        ]  # O(M*CL)
+        patient_lines_lst = [
+            line.strip().split("\t") for line in patient_lines_str
+        ]  # O(N*CP)
+
+        for lab_line in lab_lines_lst[1:]:  # O(M*CL)
+            cursor.execute(
+                "INSERT INTO labs(patient_id, admission_id, lab_name, "
+                "lab_value, lab_unit, lab_date) VALUES (?,?,?,?,?,?)",
+                lab_line,
+            )
+
+        for patient_line in patient_lines_lst[1:]:  # O(N*CP)
+            cursor.execute(
+                "INSERT INTO patients VALUES (?,?,?,?,?,?,?)", patient_line
+            )
 
 
 def date_type_conversion(date_time: str) -> datetime:
@@ -176,45 +276,12 @@ def date_type_conversion(date_time: str) -> datetime:
     return datetime.strptime(date_time, "%Y-%m-%d %H:%M:%S.%f")  # O(1)
 
 
-def search_test_results(
-    lab_records_obj: list[Lab],
-    test_name: str,
-) -> list[float]:
-    """Search Test Results by Patient ID.
-
-    Creating an empty list and indexing the dictionary of lab records based on
-    patient id takes constant time. For each patient, looping through their lab
-    files on average takes O(M/N) time. Checking if the given test name is in
-    patient lab record dictionary takes constatnt time, and appending the lab
-    result to a list takes constant time. Checking if a list is empty and
-    raise error if empty each take constant time. Returing lab results for a
-    patient take constant time. Our big-O notation is therefore O(M/N) after
-    dropping the constant factors.
-    """
-    patient_lab_results = []  # O(1)
-    for record in lab_records_obj:  # O(M/N)
-        if record.lab_name == test_name:  # O(1)
-            patient_lab_results.append(float(record.lab_value))  # O(1)
-    if not patient_lab_results:
-        raise ValueError(
-            f"""The patient has never done the test \
-[{test_name}]."""
-        )  # O(1)
-    return patient_lab_results  # O(1)
-
-
 if __name__ == "__main__":
-    patient_records = parse_data(
-        "PatientCorePopulatedTable.txt", "LabsCorePopulatedTable.txt"
+    parse_data(
+        "PatientCorePopulatedTable.txt", "LabsCorePopulatedTable.txt", 
+        "SampleDB.db"
     )
-    print(patient_records["1A8791E3-A61C-455A-8DEE-763EB90C9B2C"].age)
-    print(
-        patient_records[
-            "1A8791E3-A61C-455A-8DEE-763EB90C9B2C"
-        ].age_at_first_admission
-    )
-    print(
-        patient_records["1A8791E3-A61C-455A-8DEE-763EB90C9B2C"].is_sick(
-            "<", "URINALYSIS: RED BLOOD CELLS", 1.5
-        )
-    )
+    patient = Patient("1A8791E3-A61C-455A-8DEE-763EB90C9B2C", "SampleDB.db")
+    print(patient.age)
+    print(patient.age_at_first_admission)
+    print(patient.is_sick("<", "URINALYSIS: RED BLOOD CELLS", 1.5))
