@@ -1,9 +1,8 @@
+# PHASE 6 2ND VERSION
 """A module that analyzes EHR data."""
 from datetime import datetime
 import os
 import sqlite3
-
-# from dataclasses import dataclass
 
 # COMPUTATIONAL COMPLEXITY DEFINITION
 # N is the number of patients
