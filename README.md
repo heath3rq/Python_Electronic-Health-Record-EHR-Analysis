@@ -3,10 +3,10 @@
 The ehr-utils library provides analytical capabilities for EHR data.
 
 ### Setup Instructions
-* In your local terminal, clone the repo: 
+- [ ] In your local terminal, clone the repo: 
 ```git clone https://github.com/biostat821-2023/ehr-utils-heath3rq.git```
-* Python version: `3.10 and above`
-* Required library: `pytest`
+- [ ] Python version: `3.10 and above`
+- [ ] Required library: `pytest`
 
 
 ### Details of Each Function/Class
@@ -18,18 +18,18 @@ The `main.py` includes two custom classes and two functions:
     - `age`: returns the age in years of a given patient.
     - `age_at_first_admission` returns the age of a given patient when their earliest lab was recorded. 
     - `patient_is_sick`: checks whether a patient has ever had a test with value above (">") or below ("<") the given level
-        -  Input:  
-            (a) Patient ID in string format
-            (b) Lab test name of interest in string format
-            (c) A number as the decision criteria of test values
-        - Output: `True` or `False` indcating whether a patient has ever been sick
+        +  Input:  
+            - Patient ID in string format
+            - Lab test name of interest in string format
+            - A number as the decision criteria of test values
+        + Output: `True` or `False` indcating whether a patient has ever been sick
 
 * `parse_data` reads and parses the data files into a SQL database.
     - Input: 
-        (a) A path to a `.txt` file storing patient information where the first column is the patient ID. 
-        (b) A path to a `.txt` file storing lab information of patients where the first column is the patient ID. 
-        (c) A path to a database
-    - Output: a dictionary with Patient IDs as keys and the `Patient` class as values
+        + A path to a `.txt` file storing patient information where the first column is the patient ID. 
+        + A path to a `.txt` file storing lab information of patients where the first column is the patient ID. 
+        + A path to a database
+    - Output: This function doesn't return any value. Instead, it populates a SQL database with patient and lab information in the background. The database is updated based on the data provided as input to the function, and no direct output is generated.
 
 * `date_type_conversion` converts date in string format to datetime format. It is used internally in `age` and `age_at_first_admission` methods.
     - Input: date of birth in string format
