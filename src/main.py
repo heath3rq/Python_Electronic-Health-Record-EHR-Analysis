@@ -47,47 +47,6 @@ class Lab:
             # "WHERE patient_id = ?", (patient_id,)).fetchall()
 
 
-# @dataclass
-# class Lab:
-#     """A Class for Lab Information."""
-
-#     patient_id: str
-#     database_name: str
-#     #  lab_units: str
-#     connection = sqlite3.connect(database_name)
-#     with connection as cursor:
-#         lab_name = cursor.execute(
-#             "SELECT lab_name FROM labs WHERE patient_id = ?", (patient_id,)
-#         ).fetchall()
-#         lab_value = cursor.execute(
-#             "SELECT lab_value FROM labs WHERE patient_id = ?", (patient_id,)
-#         ).fetchall()
-#         lab_date = cursor.execute(
-#             "SELECT lab_date FROM labs WHERE patient_id = ?", (patient_id,)
-#         ).fetchall()
-#         lab_units = cursor.execute(
-#             "SELECT lab_units FROM labs WHERE patient_id = ?", (patient_id,)
-#             ).fetchall()
-
-# @dataclass
-# class Patient:
-#     """A Class for Patient Information."""
-#     patient_id: str
-#     database_name: str
-#     # dob: str,
-#     # labs: list[Lab],
-#     # gender: str,
-#     # race: str,
-#     # marital_status: str,
-#     # language: str,
-#     patient_id = patient_id
-#     connection = sqlite3.connect(database_name)
-#     with connection as cursor:
-#         dob = cursor.execute("SELECT date_of_birth FROM patients "
-#               "WHERE id = ?", (patient_id,)).fetchall()[0][0]
-#         labs = Lab(patient_id, database_name)
-
-
 class Patient:
     """A Class for Patient Information."""
 
@@ -166,10 +125,8 @@ class Patient:
         """
         if operator not in ["<", ">"]:  # O(1)
             raise ValueError("Operator can only be '<' or '>'.")  # O(1)
-        # if lab_name not in
 
         lab_values = []
-        # print(lab_values)
         for _idx, _lab_name in enumerate(self.labs.lab_name):
             if _lab_name[0] == lab_name:
                 lab_values.append(float(self.labs.lab_value[_idx][0]))
@@ -278,8 +235,9 @@ def date_type_conversion(date_time: str) -> datetime:
 
 if __name__ == "__main__":
     parse_data(
-        "PatientCorePopulatedTable.txt", "LabsCorePopulatedTable.txt", 
-        "SampleDB.db"
+        "PatientCorePopulatedTable.txt",
+        "LabsCorePopulatedTable.txt",
+        "SampleDB.db",
     )
     patient = Patient("1A8791E3-A61C-455A-8DEE-763EB90C9B2C", "SampleDB.db")
     print(patient.age)
