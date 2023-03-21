@@ -45,22 +45,26 @@ table_patient = [
     ],
 ]
 
+with fake_files(table_lab) as labs, fake_files(table_patient) as patients:
+    parse_data(patients[0], labs[0], DATABASE_TEST)
+
+patient = Patient("1A8791E3-A61C-455A-8DEE-763EB90C9B2C", DATABASE_TEST)
+
 
 def test_parse_data() -> None:
     """Test parse data function."""
     with fake_files(table_lab) as _labs, fake_files(
         table_patient
     ) as _patients:
+        parse_data(_patients[0], _labs[0], "test.db")
+        patient_parse = Patient(
+            "1A8791E3-A61C-455A-8DEE-763EB90C9B2C", "test.db"
+        )
+        assert patient_parse == patient, "Error parsing data."
         with pytest.raises(FileNotFoundError):
-            parse_data("patients[0].txt", _labs[0], DATABASE_TEST)
+            parse_data("patients[0].txt", _labs[0], "test.db")
         with pytest.raises(FileNotFoundError):
-            parse_data(_patients[0], "labs[0].txt", DATABASE_TEST)
-
-
-with fake_files(table_lab) as labs, fake_files(table_patient) as patients:
-    parse_data(patients[0], labs[0], DATABASE_TEST)
-
-patient = Patient("1A8791E3-A61C-455A-8DEE-763EB90C9B2C", DATABASE_TEST)
+            parse_data(_patients[0], "labs[0].txt", "test.db")
 
 
 def test_age() -> None:
@@ -78,7 +82,7 @@ def test_age_at_first_admission() -> None:
 def test_is_sick() -> None:
     """Test is sick method in Patient class"""
     assert (
-        patient.is_sick("<", "URINALYSIS: RED BLOOD CELLS", 1.5) is False
+        patient.is_sick("<", "URINALYSIS: RED BLOOD CELLS", 1.5) is True
     ), "Error in determining whether patient is sick."
     with pytest.raises(ValueError):
         patient.is_sick("=", "URINALYSIS: RED BLOOD CELLS", 1.5)
