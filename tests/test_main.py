@@ -55,10 +55,10 @@ def test_parse_data() -> None:
         con = sqlite3.connect("test.db")
         with con as cursor:
             count_patient = cursor.execute("SELECT COUNT(*) FROM patients")
-            assert count_patient.fetchone()[0] == 1, "Error parsing the patient file."
+            assert count_patient.fetchone(
+            )[0] == 1, "Error parsing the patient file."
             count_labs = cursor.execute("SELECT COUNT(*) FROM labs")
             assert count_labs.fetchone()[0] == 1, "Error parsing the lab file."
-
         with pytest.raises(FileNotFoundError):
             parse_data("patients[0].txt", _labs[0], "test.db")
         with pytest.raises(FileNotFoundError):
