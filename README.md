@@ -28,6 +28,7 @@ The `main.py` includes two custom classes and three functions:
     - Input: 
         (a) A path to a `.txt` file storing patient information where the first column is the patient ID. 
         (b) A path to a `.txt` file storing lab information of patients where the first column is the patient ID. 
+        (c) A path to a database
     - Output: a dictionary with Patient IDs as keys and the `Patient` class as values
 
 * `date_type_conversion` converts date in string format to datetime format. It is used internally in `age` and `age_at_first_admission` methods.
@@ -37,6 +38,7 @@ The `main.py` includes two custom classes and three functions:
 
 ### Examples
 ```python
+>> from main import parse_data, Patient
 >> parse_data("patient_file_name.txt", "labs_file_name.txt", "SampleDB.db")
 
 >> patient = Patient("1A8791E3-A61C-455A-8DEE-763EB90C9B2C", "SampleDB.db")
