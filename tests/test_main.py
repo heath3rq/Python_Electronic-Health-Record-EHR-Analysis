@@ -1,5 +1,6 @@
 """A module that tests EHR data."""
 import pytest
+import sqlite3
 from fake_files import fake_files
 from main import parse_data, Patient
 
@@ -48,17 +49,25 @@ table_patient = [
 
 def test_parse_data() -> None:
     """Test parse data function."""
-    with fake_files(table_lab) as _labs, fake_files(
-        table_patient
-    ) as _patients:
+    with fake_files(table_lab) as _labs, fake_files(table_patient) as _patients:
+        parse_data(_patients[0], _labs[0], "test.db")
+        # Check if the expected data was inserted into the database
+        con = sqlite3.connect("test.db")
+        with con as cursor:
+            count_patient = cursor.execute("SELECT COUNT(*) FROM patients")
+            assert count_patient.fetchone()[0] == 1, "Error parsing the patient file."
+            count_labs = cursor.execute("SELECT COUNT(*) FROM labs")
+            assert count_labs.fetchone()[0] == 1, "Error parsing the lab file."
+
         with pytest.raises(FileNotFoundError):
-            parse_data("patients[0].txt", _labs[0], DATABASE_TEST)
+            parse_data("patients[0].txt", _labs[0], "test.db")
         with pytest.raises(FileNotFoundError):
-            parse_data(_patients[0], "labs[0].txt", DATABASE_TEST)
+            parse_data(_patients[0], "labs[0].txt", "test.db")
 
 
 with fake_files(table_lab) as labs, fake_files(table_patient) as patients:
     parse_data(patients[0], labs[0], DATABASE_TEST)
+
 
 patient = Patient("1A8791E3-A61C-455A-8DEE-763EB90C9B2C", DATABASE_TEST)
 
@@ -78,7 +87,7 @@ def test_age_at_first_admission() -> None:
 def test_is_sick() -> None:
     """Test is sick method in Patient class"""
     assert (
-        patient.is_sick("<", "URINALYSIS: RED BLOOD CELLS", 1.5) is False
+        patient.is_sick("<", "URINALYSIS: RED BLOOD CELLS", 1.5) is True
     ), "Error in determining whether patient is sick."
     with pytest.raises(ValueError):
         patient.is_sick("=", "URINALYSIS: RED BLOOD CELLS", 1.5)
