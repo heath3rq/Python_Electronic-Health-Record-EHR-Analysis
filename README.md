@@ -10,7 +10,7 @@ The ehr-utils library provides analytical capabilities for EHR data.
 
 
 ### Details of Each Function/Class
-The `main.py` includes two custom classes and three functions:
+The `main.py` includes two custom classes and two functions:
 
 * Class `Lab` storing lab information of a patient as instance attributes by calling the SQL database.
 
