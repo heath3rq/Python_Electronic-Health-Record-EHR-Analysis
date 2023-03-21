@@ -6,3 +6,5 @@ LabsCorePopulatedTable.txt
 test_report.txt
 .coverage
 SampleDB.db
+SampleDB_Test.db
+test.db
