@@ -1,4 +1,3 @@
-# PHASE 6 2ND VERSION
 """A module that analyzes EHR data."""
 from datetime import datetime
 import os
