@@ -46,11 +46,6 @@ table_patient = [
     ],
 ]
 
-with fake_files(table_lab) as labs, fake_files(table_patient) as patients:
-    parse_data(patients[0], labs[0], DATABASE_TEST)
-
-patient = Patient("1A8791E3-A61C-455A-8DEE-763EB90C9B2C", DATABASE_TEST)
-
 
 def test_parse_data() -> None:
     """Test parse data function."""
@@ -61,12 +56,36 @@ def test_parse_data() -> None:
         # Check if the expected data was inserted into the database
         con = sqlite3.connect("test.db")
         with con as cursor:
-            count_patient = cursor.execute("SELECT COUNT(*) FROM patients")
+            patient_db = cursor.execute(
+                "SELECT id, date_of_birth FROM patients"
+            ).fetchall()
             assert (
-                count_patient.fetchone()[0] == 1
-            ), "Error parsing the patient file."
-            count_labs = cursor.execute("SELECT COUNT(*) FROM labs")
-            assert count_labs.fetchone()[0] == 1, "Error parsing the lab file."
+                patient_db[0][0] == "1A8791E3-A61C-455A-8DEE-763EB90C9B2C"
+            ), "Error parsing the patient file, patient id did not insert \
+                correctly."
+            assert (
+                patient_db[0][1] == "1973-08-16 10:58:34.413"
+            ), "Error parsing the patient file, patient date of birth did not \
+                insert correctly."
+            labs_db = cursor.execute(
+                "SELECT patient_id, lab_name, lab_value, lab_date FROM labs"
+            ).fetchall()
+            assert (
+                labs_db[0][0] == "1A8791E3-A61C-455A-8DEE-763EB90C9B2C"
+            ), "Error parsing the lab file, patient id did not insert \
+                correctly."
+            assert (
+                labs_db[0][1] == "URINALYSIS: RED BLOOD CELLS"
+            ), "Error parsing the lab file, lab value did not insert \
+                correctly."
+            assert (
+                labs_db[0][2] == "1.8"
+            ), "Error parsing the lab file, lab value did not insert \
+                correctly."
+            assert (
+                labs_db[0][3] == "1992-07-01 01:36:17.910"
+            ), "Error parsing the lab file, lab date did not insert correctly."
+
         with pytest.raises(FileNotFoundError):
             parse_data("patients[0].txt", _labs[0], "test.db")
         with pytest.raises(FileNotFoundError):
