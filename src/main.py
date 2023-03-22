@@ -3,6 +3,7 @@
 from datetime import datetime
 import os
 import sqlite3
+from dataclasses import dataclass
 
 # COMPUTATIONAL COMPLEXITY DEFINITION
 # N is the number of patients
@@ -17,25 +18,13 @@ import sqlite3
 # 4. File must contain columns in the same order as the sample input files
 
 
+@dataclass
 class Lab:
     """A Class for Lab Information."""
 
-    def __init__(
-        self,
-        database_name: str,
-        patient_id: str,
-    ) -> None:
-        """Initialize Lab Class."""
-        connection = sqlite3.connect(database_name)
-        with connection as cursor:
-            data = cursor.execute(
-                "SELECT lab_name, lab_value, lab_date "
-                "FROM labs WHERE patient_id = ?",
-                (patient_id,),
-            ).fetchall()
-            self.lab_name = list(zip(*data))[0]
-            self.lab_value = list(zip(*data))[1]
-            self.lab_date = list(zip(*data))[2]
+    lab_name: str
+    lab_value: str
+    lab_date: str
 
 
 class Patient:
@@ -54,7 +43,16 @@ class Patient:
                 "SELECT date_of_birth FROM patients WHERE id = ?",
                 (self.patient_id,),
             ).fetchall()[0][0]
-            self.labs = Lab(database_name, self.patient_id)
+            # self.labs = Lab(database_name, self.patient_id)
+            data = cursor.execute(
+                "SELECT lab_name, lab_value, lab_date "
+                "FROM labs WHERE patient_id = ?",
+                (self.patient_id,),
+            ).fetchall()
+            self.labs = [
+                Lab(lab_name, lab_value, lab_date)
+                for lab_name, lab_value, lab_date in data
+            ]
 
     @property
     def age(self) -> int:
@@ -79,13 +77,14 @@ class Patient:
         Our big-O notation is therefore O(M/N) time.
 
         """
-        lab_dates = []  # O(1)
-        for record in self.labs.lab_date:  # O(M/N)
-            lab_dates.append(date_type_conversion(record))  # O(1)
+        lab_dates = [
+            date_type_conversion(self.labs[index].lab_date)
+            for index in range(len(self.labs))
+        ]  # O(M/N)
         earliest_admission_date = min(
             lab_dates
         )  # O(M/N) because the length of the lab dates is the same
-        #    as the number of labs a patient has
+        # as the number of labs a patient has
         dob_int = date_type_conversion(self.dob)  # O(1)
         age_at_first_admission = (
             earliest_admission_date.year - dob_int.year
@@ -111,9 +110,9 @@ class Patient:
             raise ValueError("Operator can only be '<' or '>'.")  # O(1)
 
         lab_values = [
-            float(value[0])
-            for key, value in zip(self.labs.lab_name, self.labs.lab_value)
-            if key == lab_name
+            float(self.labs[index].lab_value)
+            for index in range(len(self.labs))
+            if self.labs[index].lab_name == lab_name
         ]
 
         if not lab_values:

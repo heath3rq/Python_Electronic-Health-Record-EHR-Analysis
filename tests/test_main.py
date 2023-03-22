@@ -114,7 +114,7 @@ def test_age_at_first_admission() -> None:
 def test_is_sick() -> None:
     """Test is sick method in Patient class"""
     assert (
-        patient.is_sick("<", "URINALYSIS: RED BLOOD CELLS", 1.5) is True
+        patient.is_sick("<", "URINALYSIS: RED BLOOD CELLS", 1.5) is False
     ), "Error in determining whether patient is sick."
     with pytest.raises(ValueError):
         patient.is_sick("=", "URINALYSIS: RED BLOOD CELLS", 1.5)
