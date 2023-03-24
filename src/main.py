@@ -77,8 +77,7 @@ class Patient:
 
         """
         lab_dates = [
-            date_type_conversion(lab.lab_date)
-            for lab in self.labs
+            date_type_conversion(lab.lab_date) for lab in self.labs
         ]  # O(M/N)
         earliest_admission_date = min(
             lab_dates
@@ -109,9 +108,9 @@ class Patient:
             raise ValueError("Operator can only be '<' or '>'.")  # O(1)
 
         lab_values = [
-            float(self.labs[index].lab_value)
-            for index in range(len(self.labs))
-            if self.labs[index].lab_name == lab_name
+            float(lab.lab_value)
+            for lab in self.labs
+            if lab.lab_name == lab_name
         ]
 
         if not lab_values:
