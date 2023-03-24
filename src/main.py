@@ -77,8 +77,8 @@ class Patient:
 
         """
         lab_dates = [
-            date_type_conversion(self.labs[index].lab_date)
-            for index in range(len(self.labs))
+            date_type_conversion(lab.lab_date)
+            for lab in self.labs
         ]  # O(M/N)
         earliest_admission_date = min(
             lab_dates
