@@ -57,7 +57,7 @@ True
 To run pytest and check test coverage, run the following code in terminal: 
 ```
 pip install --upgrade pip && pip install -r requirements-test.txt
-pytest main_test.py
+pytest tests/test_main.py
 coverage run -m pytest tests/test_main.py > test_report.txt
 coverage report -m
 ```
